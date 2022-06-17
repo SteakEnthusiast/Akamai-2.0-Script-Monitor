@@ -4,7 +4,9 @@ A simple program to notify you whenever the Akamai 2.0 script updates on a websi
 
 ## Features
 - Notifications via Discord Webhook Integration:
-![](https://i.ibb.co/X7spnN6/Capture.png)
+
+    ![Embed Result](https://user-images.githubusercontent.com/87380460/174300033-52e2dcc4-a8a1-478c-8858-b412a1c15e66.PNG)
+
 - Saves the Akamai 2.0 script to the file system.
     - Scripts are saved to the `\assets\downloaded_akamai_scripts\${HOSTNAME}` folder.
     - Filename format:
@@ -28,28 +30,26 @@ Open `/config/config.json/` to modify the monitor config.
 Delay is an integer value representing the number of milliseconds to wait between each check. If one isn't supplied, the program will use a default value of 5000ms.
 
 ```json
-// ...
-    "delay": ${INTEGER}, //default 5000
-// ...
+    "delay": ${INTEGER},
 ```
 
 ### Webhook Settings
 You _**MUST**_ configure the webhook settings to use this program. 
 You can extract the webhook id and token from a webhook URL: `https://discord.com/api/webhooks/${WEBHOOK_ID}/${WEBHOOK_TOKEN}`.
 ```json
-// ...
+
    "webhook":{
       "id":"${WEBHOOK_ID}",
       "token":"${WEBHOOK_TOKEN}"
    },
-// ...
+
 ```
 
 ### Site Settings
 You _**MUST**_ configure the site settings to use this program.
 `sites` is a JSON Array containing the target sites. To add another target site, simply construct a new JSON object matching the specified format and add it to the `sites` array.
 ```json
-// ...
+
 
    "sites":[
       {
@@ -62,7 +62,7 @@ You _**MUST**_ configure the site settings to use this program.
          "url":"https://${HOSTNAME3}"
       }
    ]
-/// ...
+
 ```
 
 ## Usage
