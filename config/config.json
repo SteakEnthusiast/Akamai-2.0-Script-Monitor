@@ -1,0 +1,15 @@
+{
+   "delay":5000,
+   "webhook":{
+      "id":"",
+      "token":""
+   },
+   "sites":[
+      {
+         "url":"https://accounts.zalando.com/authenticate"
+      },
+      {
+         "url":"https://nike.com"
+      }
+   ]
+}
