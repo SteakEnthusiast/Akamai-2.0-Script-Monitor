@@ -9,7 +9,7 @@ const { readFileSync } = require("fs");
  */
 async function main() {
   const config = JSON.parse(readFileSync("./config/config.json"));
-  const delay = config.delay;
+  let delay = config.delay;
   const webhookData = config.webhook;
   let urls = [];
   let errors = [];
