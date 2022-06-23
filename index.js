@@ -9,8 +9,8 @@ const { readFileSync } = require("fs");
  */
 async function main() {
   const config = JSON.parse(readFileSync("./config/config.json"));
-  let delay = config.delay;
-  let webhookData = config.webhook;
+  const delay = config.delay;
+  const webhookData = config.webhook;
   let urls = [];
   let errors = [];
   let warnings = [];
@@ -47,7 +47,7 @@ async function main() {
   // Print Errors
   if (errors.length > 1) {
     console.log(`[Fatal]: Detected ${errors.length} errors:`);
-    for (let err of errors) {
+    for (const err of errors) {
       console.log("Error:", err);
     }
     //Exit the program if any errors
@@ -56,7 +56,7 @@ async function main() {
   // Print Warnings
   if (warnings.length > 1) {
     console.log(`[WARNING]: Detected ${warnings.length} warnings:`);
-    for (let err of errors) {
+    for (const err of errors) {
       console.log("Warning:", err);
     }
   }

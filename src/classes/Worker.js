@@ -3,7 +3,6 @@ const { load } = require("cheerio");
 const crypto = require("crypto");
 const { writeFile, mkdir } = require("fs").promises;
 const URL = require("url").URL;
-var path = require("path");
 /**
  * This class holds all the variables and functions related to retrieving and parsing the contents of the script.
  */
@@ -40,17 +39,16 @@ class Worker {
    */
   run = async () => {
     try {
-      let siteData, akamaiURL, scriptBody, scriptHash;
-      siteData = await this.siteRequest();
+      const siteData = await this.siteRequest();
       if (!siteData) return;
-      akamaiURL = this.parseAkamaiUrl(siteData);
+      const akamaiURL = this.parseAkamaiUrl(siteData);
       if (!akamaiURL) return;
-      scriptBody = await this.scriptRequest(akamaiURL);
+      const scriptBody = await this.scriptRequest(akamaiURL);
       if (!scriptBody) return;
-      scriptHash = this.getScriptHash(scriptBody);
+      const scriptHash = this.getScriptHash(scriptBody);
       if (!scriptHash) return;
       if (this.isNewHash(scriptHash)) {
-        let topIdentifier = this.getTopIdentifier(scriptBody);
+        const topIdentifier = this.getTopIdentifier(scriptBody);
         this.saveScriptToDisk(scriptBody, topIdentifier);
         return {
           site: this.host,
@@ -145,8 +143,8 @@ class Worker {
 
   getScriptHash = (content) => {
     // console.log("Hashing script content...");
-    let hash = crypto.createHash("md5");
-    let data = hash.update(content, "utf-8");
+    const hash = crypto.createHash("md5");
+    const data = hash.update(content, "utf-8");
     const scriptHash = data.digest("hex");
     // console.log("Got script hash:", scriptHash);
     return scriptHash;
@@ -159,7 +157,7 @@ class Worker {
    * @returns {string} The name of the top identifier.
    */
   getTopIdentifier = (content) => {
-    let topIdentifierName = "";
+    const topIdentifierName = "";
     try {
       topIdentifierName = content.split("(function(){var ")[1].split("={}")[0];
       return topIdentifierName;
