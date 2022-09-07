@@ -208,7 +208,7 @@ class Worker {
    * @param {string} newHash The newly computed hash
    * @returns {Boolean} false for identical hashes, true for different hashes.
    */
-  isNewHash = async (newHash) => {
+  isNewHash = (newHash) => {
     // Check if it's already in the folder
     let isAlreadyInFolder;
     const fileNames = readdirSync(
@@ -241,10 +241,10 @@ class Worker {
    * @param {string} scriptBody the raw contents of the script.
    * @param {string} topIdentifier the name of the top identifier.
    */
-  saveScriptToDisk = async (scriptBody, topIdentifier) => {
+  saveScriptToDisk = (scriptBody, topIdentifier) => {
     const outputPath = `.\\assets\\downloaded_akamai_scripts\\${this.host}\\${this.host}_${topIdentifier}_${this.scriptHash}.js`;
 
-    await writeFileSync(outputPath, scriptBody, (err) => {
+    writeFileSync(outputPath, scriptBody, (err) => {
       if (err) {
         console.log("Error writing file", err);
       } else {
