@@ -1,10 +1,10 @@
 const axios = require("axios");
 const { load } = require("cheerio");
 const crypto = require("crypto");
-const { writeFile, mkdir } = require("fs").promises;
+const { mkdir } = require("fs").promises;
 const URL = require("url").URL;
 var path = require("path");
-const { readdirSync } = require("fs");
+const { readdirSync, writeFileSync } = require("fs");
 
 /**
  * This class holds all the variables and functions related to retrieving and parsing the contents of the script.
@@ -19,6 +19,7 @@ class Worker {
     this.seenHashes = [];
     this.uniqueCount = 0;
     this.scriptsScrapedCount = 0;
+    this.makeDirectory();
   }
   get site() {
     return this._site;
@@ -83,6 +84,18 @@ class Worker {
       return null;
     }
   };
+
+  /**
+   * Creates the directory for the worker.
+   */
+  makeDirectory = async () => {
+    // If directory doesn't already exist, make it
+    const dirToSaveAt = `.\\assets\\downloaded_akamai_scripts\\${this.host}`;
+    await mkdir(dirToSaveAt, { recursive: true }, (err) => {
+      if (err) throw err;
+    });
+  };
+
   /**
    * Fetch the contents of the target site.
    * @returns {string} The response body of the request.
@@ -195,7 +208,7 @@ class Worker {
    * @param {string} newHash The newly computed hash
    * @returns {Boolean} false for identical hashes, true for different hashes.
    */
-  isNewHash = (newHash) => {
+  isNewHash = async (newHash) => {
     // Check if it's already in the folder
     let isAlreadyInFolder;
     const fileNames = readdirSync(
@@ -229,14 +242,9 @@ class Worker {
    * @param {string} topIdentifier the name of the top identifier.
    */
   saveScriptToDisk = async (scriptBody, topIdentifier) => {
-    const dirToSaveAt = `.\\assets\\downloaded_akamai_scripts\\${this.host}`;
     const outputPath = `.\\assets\\downloaded_akamai_scripts\\${this.host}\\${this.host}_${topIdentifier}_${this.scriptHash}.js`;
 
-    await mkdir(dirToSaveAt, { recursive: true }, (err) => {
-      if (err) throw err;
-    });
-
-    await writeFile(outputPath, scriptBody, (err) => {
+    await writeFileSync(outputPath, scriptBody, (err) => {
       if (err) {
         console.log("Error writing file", err);
       } else {

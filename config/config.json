@@ -7,9 +7,6 @@
    "sites":[
       {
          "url":"https://accounts.zalando.com/authenticate"
-      },
-      {
-         "url":"https://nike.com"
       }
    ]
 }
