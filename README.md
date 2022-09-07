@@ -44,7 +44,7 @@ Open `/config/config.json/` to modify the monitor config.
 Delay is an integer value representing the number of milliseconds to wait between each check. If one isn't supplied, the program will use a default value of 5000ms.
 
 ```json
-    "delay": INTEGER,
+    "delay": 5000,
 ```
 
 ### Webhook Settings
@@ -98,3 +98,18 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+# Bonus: Akamai 2.0 and Akamai 1.75 Sensor Data Generation API For Rent
+
+## Features:
+- 🧪 Supports versions: 1.75 & 2.0
+- 🧪 custom usage plans that fits every business model
+- 🧪 free trial
+- 🧪 24/7 support from all timezones
+- 🧪 scales without any limitations
+- 🌐 FREE access to the best TLS client on the market. Each Akamai client gets a free TLS api key!
+## Discord
+
+Join our discord server and create a ticket for more information:
+https://discord.gg/dmYqqeVnN2
+
