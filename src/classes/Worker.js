@@ -3,6 +3,9 @@ const { load } = require("cheerio");
 const crypto = require("crypto");
 const { writeFile, mkdir } = require("fs").promises;
 const URL = require("url").URL;
+var path = require("path");
+const { readdirSync } = require("fs");
+
 /**
  * This class holds all the variables and functions related to retrieving and parsing the contents of the script.
  */
@@ -13,6 +16,9 @@ class Worker {
     this._delay = data.delay;
     this._scriptHash = "";
     this._akamaiURL = "";
+    this.seenHashes = [];
+    this.uniqueCount = 0;
+    this.scriptsScrapedCount = 0;
   }
   get site() {
     return this._site;
@@ -32,6 +38,7 @@ class Worker {
   set scriptHash(hash) {
     this._scriptHash = hash;
   }
+
   /**
    * The main worker function for use in monitor.js
    * The return value will be used to construct the webhook.
@@ -39,16 +46,28 @@ class Worker {
    */
   run = async () => {
     try {
-      const siteData = await this.siteRequest();
+      let siteData, akamaiURL, scriptBody;
+      siteData = await this.siteRequest();
       if (!siteData) return;
-      const akamaiURL = this.parseAkamaiUrl(siteData);
+      akamaiURL = this.parseAkamaiUrl(siteData);
       if (!akamaiURL) return;
-      const scriptBody = await this.scriptRequest(akamaiURL);
+      scriptBody = await this.scriptRequest(akamaiURL);
       if (!scriptBody) return;
-      const scriptHash = this.getScriptHash(scriptBody);
-      if (!scriptHash) return;
-      if (this.isNewHash(scriptHash)) {
-        const topIdentifier = this.getTopIdentifier(scriptBody);
+      this.scriptHash = this.getScriptHash(scriptBody);
+      if (!this.scriptHash) return;
+
+      // Increment number of scripts scraped
+      this.scriptsScrapedCount++;
+      const isNewHash = this.isNewHash(this.scriptHash);
+
+      // Print out statistics
+
+      console.log(
+        `${this.uniqueCount} out of ${this.scriptsScrapedCount} scripts scraped this session were unique.`
+      );
+
+      if (isNewHash) {
+        let topIdentifier = this.getTopIdentifier(scriptBody);
         this.saveScriptToDisk(scriptBody, topIdentifier);
         return {
           site: this.host,
@@ -56,6 +75,8 @@ class Worker {
           akamaiURL: this.akamaiURL,
           topIdentifier: topIdentifier,
         };
+      } else {
+        return null;
       }
     } catch (err) {
       console.error(err);
@@ -143,8 +164,8 @@ class Worker {
 
   getScriptHash = (content) => {
     // console.log("Hashing script content...");
-    const hash = crypto.createHash("md5");
-    const data = hash.update(content, "utf-8");
+    let hash = crypto.createHash("md5");
+    let data = hash.update(content, "utf-8");
     const scriptHash = data.digest("hex");
     // console.log("Got script hash:", scriptHash);
     return scriptHash;
@@ -153,11 +174,14 @@ class Worker {
    * Since Akamai 2.0 has no version numbers and frequent updates, its common to use the top identifier name to represent the version.
    * This is for reference only and to make searching for the saved script easier.
    * They could, theoretically, push a different script that has an old identifier name at the top. It's best to rely on the script hash for differences.
+   *
+   * Update (September 2022): They do this now!
+   *
    * @param {string} content The raw body of the Akamai 2.0 script.
    * @returns {string} The name of the top identifier.
    */
   getTopIdentifier = (content) => {
-    const topIdentifierName = "";
+    let topIdentifierName = "";
     try {
       topIdentifierName = content.split("(function(){var ")[1].split("={}")[0];
       return topIdentifierName;
@@ -172,16 +196,30 @@ class Worker {
    * @returns {Boolean} false for identical hashes, true for different hashes.
    */
   isNewHash = (newHash) => {
-    // console.log("Comparing hashes:\nOld:", this.scriptHash, "\nNew:", newHash);
-    if (newHash === this.scriptHash) {
-      console.log(`Same hash for: ${this.host}: ${this.scriptHash}`);
+    // Check if it's already in the folder
+    let isAlreadyInFolder;
+    const fileNames = readdirSync(
+      `.\\assets\\downloaded_akamai_scripts\\${this.host}`
+    );
+
+    isAlreadyInFolder = fileNames.some((filename) =>
+      filename.includes(newHash)
+    );
+
+    if (isAlreadyInFolder) {
       return false;
     }
-    this.scriptHash = newHash;
-    console.log(
-      `Script change found on ${this.host}\n Setting new hash:`,
-      newHash
-    );
+
+    // Check if it was seen in the session
+    if (this.seenHashes.includes(newHash)) {
+      console.log("Found repeating hash");
+      return false;
+    }
+    console.log(`Script change found on ${this.host}\n Hash:`, newHash);
+    this.seenHashes.push(newHash);
+    // Increment unique count
+
+    this.uniqueCount++;
     return true;
   };
   /**

@@ -10,7 +10,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * @param {Object} webhookData The webhook id and key, from config.json.
  */
 async function monitor(sites, delay, webhookData) {
-  const workerPool = [];
+  let workerPool = [];
   for (site of sites) {
     const worker = new Worker({
       site: site,
@@ -22,7 +22,7 @@ async function monitor(sites, delay, webhookData) {
     for (const worker of workerPool) {
       const workerResult = await worker.run();
       if (workerResult != null) {
-        const webhook = new MonitorWebhook(
+        let webhook = new MonitorWebhook(
           {
             id: webhookData.id,
             token: webhookData.token,
