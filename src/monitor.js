@@ -1,5 +1,5 @@
 const { Worker } = require("./classes/Worker");
-const { MonitorWebhook } = require("./classes/webhook");
+const { MonitorWebhook } = require("./classes/Webhook");
 const fs = require("fs");
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 /**
